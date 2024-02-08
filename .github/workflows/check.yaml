@@ -18,6 +18,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Test
+      # cp backend/.env.sample backend/.env
         run: | 
-          cp backend/.env.example backend/.env
+          
+          echo "${{ secrets.ENV_FILE }}" > backend/.env
           run: docker-compose run --rm backend sh -c "python manage.py test"
