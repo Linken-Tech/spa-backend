@@ -14,4 +14,5 @@ class MenuViewSet(viewsets.ModelViewSet):
 # @schema(None)
 class HealthCheckView(generics.GenericAPIView):
     def get(self, request):
-        return Response(status=status.HTTP_200_OK)
+        data = 1 / 0
+        return Response(status=status.HTTP_200_OK, data=data)
