@@ -137,6 +137,5 @@ GitHub.sublime-settings
 .history
 env/
 staticfiles/
-static/
 .env.development
 .env.production
