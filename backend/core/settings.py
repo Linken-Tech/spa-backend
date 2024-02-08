@@ -14,6 +14,8 @@ from pathlib import Path
 import os
 from decouple import config
 from dj_database_url import parse as db_url
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,6 +30,19 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOST', cast=lambda v: [s.strip() for s in v.split(',')])
+
+if DEBUG == False:
+    sentry_sdk.init(
+        dsn=config("SENTRY_DSN"),
+        integrations=[
+            DjangoIntegration(),
+        ],
+        max_breadcrumbs=50,
+        traces_sample_rate=(config("SENTRY_TRACE_RATE")),
+        sample_rate=1,
+        send_default_pii=True,
+        environment=(config("SENTRY_ENV")),
+    )
 
 
 # Application definition
