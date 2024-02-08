@@ -20,6 +20,5 @@ jobs:
       - name: Test
       # cp backend/.env.sample backend/.env
         run: | 
-          
           echo "${{ secrets.ENV_FILE }}" > backend/.env
-          run: docker-compose run --rm backend sh -c "python manage.py test"
+          docker-compose run --rm backend sh -c "python manage.py test"
