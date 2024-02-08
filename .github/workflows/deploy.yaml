@@ -50,7 +50,6 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build and Push Docker Image
-        # id: build-image
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
@@ -62,6 +61,7 @@ jobs:
           docker-compose build
           docker-compose push
 
+jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-20.04
