@@ -14,4 +14,4 @@ class MenuViewSet(viewsets.ModelViewSet):
 # @schema(None)
 class HealthCheckView(generics.GenericAPIView):
     def get(self, request):
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK, data="Deploy from cicds")
