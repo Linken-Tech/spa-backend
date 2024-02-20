@@ -85,6 +85,7 @@ class VehicleSerializer(serializers.ModelSerializer):
         car_images = validated_data.pop("vehicle_images", [])
         validated_data.pop("vehicle_rent", {})
         create_vehicle = super().create(validated_data)
+        print("testing 123")
 
         if car_doc:
             create_vehicle.documents.bulk_create(
