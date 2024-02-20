@@ -2,7 +2,7 @@
 from vehicle.models import Vehicle, VehicleBrand, VehicleDocument
 from rest_framework import generics
 from vehicle import serializers as vehicle_srlz
-from django.utils import timezone 
+from django.utils import timezone
 import os
 import zipfile
 from django.http import Http404, HttpResponse
@@ -11,14 +11,17 @@ import io
 from django.shortcuts import get_list_or_404
 from vehicle import filters
 
+
 # Vehicle Brand Here
 class BrandList(generics.ListCreateAPIView):
     """
     Create New Brand
     View All Brand in a List
     """
+
     queryset = VehicleBrand.objects.exclude(removed__isnull=False)
     serializer_class = vehicle_srlz.VehicleBrandSerializer
+
 
 class BrandDetails(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -26,6 +29,7 @@ class BrandDetails(generics.RetrieveUpdateDestroyAPIView):
     Update Brand Details
     Delete Brand
     """
+
     queryset = VehicleBrand.objects.all()
     serializer_class = vehicle_srlz.VehicleBrandSerializer
 
@@ -33,15 +37,18 @@ class BrandDetails(generics.RetrieveUpdateDestroyAPIView):
         instance.removed = timezone.now()
         return instance.save()
 
+
 # Vehicle Here
 class VehicleList(generics.ListCreateAPIView):
     """
     Create New Car
     View All Car in a List
     """
+
     queryset = Vehicle.objects.exclude(removed__isnull=False)
     serializer_class = vehicle_srlz.VehicleSerializer
     filterset_class = filters.VehicleFilter
+
 
 class VehicleDetails(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -49,6 +56,7 @@ class VehicleDetails(generics.RetrieveUpdateDestroyAPIView):
     Update Car Details
     Delete Car
     """
+
     queryset = Vehicle.objects.all()
     serializer_class = vehicle_srlz.VehicleSerializer
 
@@ -60,23 +68,32 @@ class VehicleDetails(generics.RetrieveUpdateDestroyAPIView):
         instance.removed = timezone.now()
         return instance.save()
 
+
 class DownloadVehicleDocuments(generics.GenericAPIView):
     """
     Download Vehicle Document
     """
+
     queryset = VehicleDocument.objects.all()
     serializer_class = vehicle_srlz.DownloadVehicleDocumentSerializer
-    lookup_field = 'vehicle'
+    lookup_field = "vehicle"
 
     def get_queryset(self):
-        queryset = super().get_queryset().filter(vehicle=self.kwargs.get('vehicle')).exclude(removed__isnull=False)
+        queryset = (
+            super()
+            .get_queryset()
+            .filter(vehicle=self.kwargs.get("vehicle"))
+            .exclude(removed__isnull=False)
+        )
         return queryset
 
     def get(self, request, *args, **kwargs):
-        doc_id = request.GET.getlist('doc_id', [])
+        doc_id = request.GET.getlist("doc_id", [])
         files = []
         if doc_id:
-            queryset = get_list_or_404(VehicleDocument, pk__in=doc_id, removed__isnull=True)
+            queryset = get_list_or_404(
+                VehicleDocument, pk__in=doc_id, removed__isnull=True
+            )
         else:
             queryset = self.get_queryset()
 
@@ -98,8 +115,8 @@ class DownloadVehicleDocuments(generics.GenericAPIView):
                 zf.write(fpath, zip_path)
             zf.close()
 
-            response = HttpResponse(s.getvalue(), content_type = "application/zip")
-            response['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
+            response = HttpResponse(s.getvalue(), content_type="application/zip")
+            response["Content-Disposition"] = "attachment; filename=%s" % zip_filename
 
             return response
         raise Http404

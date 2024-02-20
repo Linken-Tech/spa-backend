@@ -7,18 +7,20 @@ import vehicle.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('vehicle', '0005_remove_vehicle_vehicle_rent_vehicle_price_per_day_and_more'),
+        ("vehicle", "0005_remove_vehicle_vehicle_rent_vehicle_price_per_day_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='vehicledocument',
-            name='document',
-            field=models.FileField(null=True, upload_to=vehicle.models.vehicle_document_upload_path),
+            model_name="vehicledocument",
+            name="document",
+            field=models.FileField(
+                null=True, upload_to=vehicle.models.vehicle_document_upload_path
+            ),
         ),
         migrations.AlterField(
-            model_name='vehicleimage',
-            name='vehicle_image',
+            model_name="vehicleimage",
+            name="vehicle_image",
             field=models.ImageField(upload_to=vehicle.models.vehicle_image_upload_path),
         ),
     ]
