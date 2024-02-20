@@ -6,28 +6,36 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('vehicle', '0006_alter_vehicledocument_document_and_more'),
+        ("vehicle", "0006_alter_vehicledocument_document_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='vehicle',
-            name='price_of_cost',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=65, null=True),
+            model_name="vehicle",
+            name="price_of_cost",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=65, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='vehicle',
-            name='price_of_sale',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=65, null=True),
+            model_name="vehicle",
+            name="price_of_sale",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=65, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='vehicle',
-            name='price_per_day',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=65, null=True),
+            model_name="vehicle",
+            name="price_per_day",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=65, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='vehicle',
-            name='price_per_month',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=65, null=True),
+            model_name="vehicle",
+            name="price_per_month",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=65, null=True
+            ),
         ),
     ]

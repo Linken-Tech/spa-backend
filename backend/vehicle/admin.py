@@ -1,5 +1,6 @@
 from django.contrib import admin
-from vehicle.models import *
+from vehicle.models import Vehicle, VehicleBrand, VehicleDocument, VehicleImage
+
 
 # Custom Admin
 class VehicleAdmin(admin.ModelAdmin):
@@ -13,12 +14,12 @@ class VehicleAdmin(admin.ModelAdmin):
         "price_of_sale",
     )
     list_filter = ["vehicle_brand"]
-    ordering =("vehicle_brand",)
-    search_fields = ["vehicle","vehicle_brand__brand_name"]
+    ordering = ("vehicle_brand",)
+    search_fields = ["vehicle", "vehicle_brand__brand_name"]
 
 
 # Register your models here.
-admin.site.register(Vehicle,VehicleAdmin)
+admin.site.register(Vehicle, VehicleAdmin)
 admin.site.register(VehicleBrand)
 admin.site.register(VehicleDocument)
 admin.site.register(VehicleImage)

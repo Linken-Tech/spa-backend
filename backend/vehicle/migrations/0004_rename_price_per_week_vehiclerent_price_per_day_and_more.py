@@ -7,27 +7,31 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('vehicle', '0003_alter_vehicle_accessories'),
+        ("vehicle", "0003_alter_vehicle_accessories"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='vehiclerent',
-            old_name='price_per_week',
-            new_name='price_per_day',
+            model_name="vehiclerent",
+            old_name="price_per_week",
+            new_name="price_per_day",
         ),
         migrations.RemoveField(
-            model_name='vehiclerent',
-            name='rent_active',
+            model_name="vehiclerent",
+            name="rent_active",
         ),
         migrations.AddField(
-            model_name='vehicle',
-            name='vehicle_rent',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to='vehicle.vehiclerent'),
+            model_name="vehicle",
+            name="vehicle_rent",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="vehicle.vehiclerent",
+            ),
         ),
         migrations.AddField(
-            model_name='vehiclerent',
-            name='is_active',
+            model_name="vehiclerent",
+            name="is_active",
             field=models.BooleanField(default=True),
         ),
     ]
