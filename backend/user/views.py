@@ -4,12 +4,3 @@ from rest_framework import status
 
 
 # @schema(None)
-class HealthCheckView(generics.GenericAPIView):
-    def get(self, request):
-        return Response(status=status.HTTP_200_OK, data="Deploy from cicds")
-
-
-class ErrorCheckView(generics.GenericAPIView):
-    def get(self, request):
-        data = 1 / 0
-        return Response(status=status.HTTP_200_OK, data=data)

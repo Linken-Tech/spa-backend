@@ -60,9 +60,11 @@ INSTALLED_APPS = [
     "drf_yasg",
     "rest_framework_simplejwt",
     "storages",
+
     "user",
     "vehicle",
     "feedback",
+    "utils"
 ]
 
 MIDDLEWARE = [
@@ -97,15 +99,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "core.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-database_switch = 1
-
-if database_switch == 1:
-    # locahost database
-    DATABASES = {
+DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
             "NAME": config("DB_NAME"),
@@ -114,12 +108,6 @@ if database_switch == 1:
             "HOST": config("DB_HOST"),
             "PORT": config("DB_PORT", cast=int),
         }
-    }
-elif database_switch == 2:
-    DATABASES = {
-        "default": db_url(
-            "sqlite:///" + os.path.join(BASE_DIR, "db.sqlite3"),
-        )
     }
 
 # Password validation
