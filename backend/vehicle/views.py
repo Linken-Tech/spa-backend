@@ -19,7 +19,7 @@ class BrandList(generics.ListCreateAPIView):
     View All Brand in a List
     """
 
-    queryset = VehicleBrand.objects.exclude(removed__isnull=False)
+    queryset = VehicleBrand.objects.exclude(removed_at__isnull=False)
     serializer_class = vehicle_srlz.VehicleBrandSerializer
 
 
