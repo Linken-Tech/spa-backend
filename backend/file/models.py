@@ -2,6 +2,7 @@ from django.contrib.contenttypes import fields
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 from file.utils import vehicle_image_upload_path, vehicle_document_upload_path
 
@@ -12,7 +13,7 @@ class BaseMedia(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = fields.GenericForeignKey("content_type", "object_id")
     company = models.ForeignKey("organization.Organization", on_delete=models.CASCADE)
-    created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
+    created_at = models.DateTimeField(_("Created At"), default=timezone.now)
     modified_at = models.DateTimeField(_("Modified At"), auto_now=True)
 
     class Meta:

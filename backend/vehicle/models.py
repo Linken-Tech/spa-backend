@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.contenttypes import fields
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 from file.models import Image, Document
 from utils.choices import FuelType
@@ -10,7 +11,7 @@ from utils.choices import FuelType
 # Create your models here.
 class VehicleBrand(models.Model):
     brand_name = models.CharField(_("Brand Name"), max_length=255)
-    created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
+    created_at = models.DateTimeField(_("Created At"), default=timezone.now)
     modified_at = models.DateTimeField(_("Modified At"), auto_now=True)
     removed_at = models.DateTimeField(_("Removed At"), null=True, blank=True)
 
@@ -24,7 +25,7 @@ class VehicleBrand(models.Model):
 
 class VehicleModel(models.Model):
     model_name = models.CharField(_("Model Name"), max_length=255)
-    created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
+    created_at = models.DateTimeField(_("Created At"), default=timezone.now)
     modified_at = models.DateTimeField(_("Modified At"), auto_now=True)
     removed_at = models.DateTimeField(_("Removed At"), null=True, blank=True)
 
