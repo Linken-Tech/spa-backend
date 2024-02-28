@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
-    BaseUserManager,
+    UserManager,
 )
 
 from utils.validators import RegexValidator
@@ -15,7 +15,11 @@ class UserAuth(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["password"]
 
-    objects = BaseUserManager()
+    objects = UserManager()
+
+    class Meta:
+        verbose_name = _("User Auth")
+        verbose_name_plural = _("User Auth")
 
     def __str__(self) -> str:
         return self.username
