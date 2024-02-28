@@ -1,16 +1,15 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import (
-    AbstractBaseUser,
-    PermissionsMixin,
-    UserManager,
-)
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 from utils.validators import RegexValidator
+from user.manager import UserManager
 
 
 class UserAuth(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=100, unique=True)
+    is_staff = models.BooleanField(_("Is Staff"), default=False)
+    is_admin = models.BooleanField(_("Is Admin"), default=False)
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["password"]
@@ -24,18 +23,6 @@ class UserAuth(AbstractBaseUser, PermissionsMixin):
     def __str__(self) -> str:
         return self.username
 
-    @property
-    def is_staff(self):
-        return self.user.is_staff
-
-    @property
-    def is_admin(self):
-        return self.user.is_admin
-
-    @property
-    def is_active(self):
-        return self.user.is_active
-
 
 class User(models.Model):
     user_auth = models.OneToOneField("UserAuth", on_delete=models.CASCADE)
@@ -47,8 +34,6 @@ class User(models.Model):
     organization = models.ForeignKey(
         "organization.Organization", on_delete=models.CASCADE
     )
-    is_admin = models.BooleanField(_("Is Admin"), default=False)
-    is_staff = models.BooleanField(_("Is Staff"), default=False)
     is_active = models.BooleanField(_("Is Active"), default=True)
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
     modified_at = models.DateTimeField(_("Modified At"), auto_now=True)
