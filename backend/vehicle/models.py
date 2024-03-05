@@ -71,6 +71,7 @@ class VehicleRent(BaseVehicle):
     price_per_month = models.DecimalField(
         _("Price Per Month"), max_digits=65, decimal_places=2
     )
+    is_rent = models.BooleanField(_("Is Rent"), default=False)
 
     class Meta:
         verbose_name = _("Vehicle Rent")
