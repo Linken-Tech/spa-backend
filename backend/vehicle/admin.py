@@ -1,25 +1,25 @@
 from django.contrib import admin
-from vehicle.models import Vehicle, VehicleBrand, VehicleDocument, VehicleImage
+from vehicle.models import VehicleSale, VehicleRent, VehicleBrand
 
 
 # Custom Admin
-class VehicleAdmin(admin.ModelAdmin):
-    model = Vehicle
-    list_display = (
-        "vehicle",
-        "vehicle_brand",
-        "price_per_day",
-        "price_per_month",
-        "price_of_cost",
-        "price_of_sale",
-    )
-    list_filter = ["vehicle_brand"]
-    ordering = ("vehicle_brand",)
-    search_fields = ["vehicle", "vehicle_brand__brand_name"]
+class VehicleRentAdmin(admin.ModelAdmin):
+    model = VehicleRent
+    list_display = ("title", "brand", "price_per_day", "price_per_month", "is_rent")
+    list_filter = ["brand"]
+    ordering = ("brand",)
+    search_fields = ["title", "brand__brand_name"]
+
+
+class VehicleSaleAdmin(admin.ModelAdmin):
+    model = VehicleSale
+    list_display = ("title", "brand", "sale_price", "cost_price", "is_available")
+    list_filter = ["brand"]
+    ordering = ("brand",)
+    search_fields = ["title", "brand__brand_name"]
 
 
 # Register your models here.
-admin.site.register(Vehicle, VehicleAdmin)
+admin.site.register(VehicleRent, VehicleRentAdmin)
+admin.site.register(VehicleSale, VehicleSaleAdmin)
 admin.site.register(VehicleBrand)
-admin.site.register(VehicleDocument)
-admin.site.register(VehicleImage)

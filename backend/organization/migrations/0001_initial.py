@@ -3,19 +3,16 @@
 import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
-import django.utils.timezone
 
 
 class Migration(migrations.Migration):
     initial = True
 
-    dependencies = [
-        ("organization", "0001_initial"),
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name="Feedback",
+            name="Organization",
             fields=[
                 (
                     "id",
@@ -27,28 +24,47 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "title",
-                    models.CharField(max_length=50, null=True, verbose_name="Title"),
-                ),
-                (
-                    "customer_name",
+                    "company_name",
                     models.CharField(
-                        default="anonymous",
-                        max_length=100,
-                        verbose_name="Customer Name",
+                        max_length=200, unique=True, verbose_name="Company Name"
+                    ),
+                ),
+                ("email", models.EmailField(max_length=200, verbose_name="Email")),
+                ("address", models.TextField(verbose_name="Address")),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Created At"),
+                ),
+                (
+                    "modified_at",
+                    models.DateTimeField(auto_now=True, verbose_name="Modified At"),
+                ),
+            ],
+            options={
+                "verbose_name": "Organization",
+                "verbose_name_plural": "Organizations",
+            },
+        ),
+        migrations.CreateModel(
+            name="OrganizationContact",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 (
-                    "customer_email",
-                    models.EmailField(
-                        max_length=200, null=True, verbose_name="Customer Email"
-                    ),
+                    "contact_name",
+                    models.CharField(max_length=255, verbose_name="Contact Name"),
                 ),
                 (
-                    "customer_phone",
+                    "phone",
                     models.CharField(
                         max_length=15,
-                        null=True,
                         validators=[
                             django.core.validators.RegexValidator(
                                 message="Only 7 - 15 digits are allowed.",
@@ -58,32 +74,26 @@ class Migration(migrations.Migration):
                         verbose_name="Phone No.",
                     ),
                 ),
-                (
-                    "description",
-                    models.TextField(null=True, verbose_name="Description"),
-                ),
-                (
-                    "is_solved",
-                    models.BooleanField(default=False, verbose_name="Is Solved"),
-                ),
+                ("position", models.CharField(max_length=100, verbose_name="Position")),
                 (
                     "created_at",
-                    models.DateTimeField(
-                        default=django.utils.timezone.now, verbose_name="Created At"
-                    ),
+                    models.DateTimeField(auto_now_add=True, verbose_name="Created At"),
                 ),
                 (
                     "modified_at",
                     models.DateTimeField(auto_now=True, verbose_name="Modified At"),
                 ),
                 (
-                    "organization",
+                    "company",
                     models.ForeignKey(
-                        null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         to="organization.organization",
                     ),
                 ),
             ],
+            options={
+                "verbose_name": "Organization Contact",
+                "verbose_name_plural": "Organization Contacts",
+            },
         ),
     ]

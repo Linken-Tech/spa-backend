@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     "user",
     "vehicle",
     "feedback",
+    "file",
+    "organization",
 ]
 
 MIDDLEWARE = [
@@ -216,3 +218,5 @@ SWAGGER_SETTINGS = {
 REDOC_SETTINGS = {
     "LAZY_RENDERING": False,
 }
+
+AUTH_USER_MODEL = "user.UserAuth"
