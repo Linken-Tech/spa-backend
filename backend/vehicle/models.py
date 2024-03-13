@@ -61,7 +61,8 @@ class BaseVehicle(models.Model):
     modified_at = models.DateTimeField(_("Modified At"), auto_now=True)
 
     class Meta:
-        abstract = True
+        verbose_name = _("Vehicle")
+        verbose_name_plural = _("Vehicle")
 
 
 class VehicleRent(BaseVehicle):
@@ -72,6 +73,7 @@ class VehicleRent(BaseVehicle):
         _("Price Per Month"), max_digits=65, decimal_places=2
     )
     is_rent = models.BooleanField(_("Is Rent"), default=False)
+    vehicle = models.ForeignKey("vehicle.BaseVehicle", on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _("Vehicle Rent")
@@ -84,6 +86,7 @@ class VehicleRent(BaseVehicle):
 class VehicleSale(BaseVehicle):
     cost_price = models.DecimalField(_("Cost Price"), max_digits=65, decimal_places=2)
     sale_price = models.DecimalField(_("Sale Price"), max_digits=65, decimal_places=2)
+    vehicle = models.ForeignKey("vehicle.BaseVehicle", on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _("Vehicle Sale")
