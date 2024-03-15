@@ -23,16 +23,18 @@ class RentSerializer(serializers.ModelSerializer):
         fields = ["price_per_day", "price_per_month", "is_rent"]
 
 class VehicleSerializer(serializers.ModelSerializer):
+    brand = BrandSerializer()
+    model = ModelSerializer()
     accessories = serializers.ListField(write_only=True)
     images = serializers.ListField(write_only=True, required=False)
     documents = serializers.ListField(write_only=True, required=False)
-    sale = SaleSerializer()
-    rent = RentSerializer()
+    company = OrganizationSerializer()
+    sale_or_rent_vehicle = serializers.SerializerMethodField(method_name="get_sale_or_rent_vehicle")
     delete_images = serializers.ListField(write_only=True, required=False)
     delete_documents = serializers.ListField(write_only=True, required=False)
     class Meta:
-        model = Vehicle
-        fields = ["title", "model", "brand", "overview", "model_year", "number_plate", "fuel_type", "seating_capacity", "mileage", "accessories", "images", "documents", "is_available", "sale", "rent", "delete_images", "delete_documents"]
+        model = BaseVehicle
+        fields = ["title", "model", "brand", "overview", "model_year", "number_plate", "fuel_type", "seating_capacity", "mileage", "accessories", "images", "documents", "company", "is_available", "sale_or_rent_vehicle", "delete_images", "delete_documents"]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -41,5 +43,13 @@ class VehicleSerializer(serializers.ModelSerializer):
         representation["accessories"] = instance.accessories
         representation["images"] = ImageSerializer(instance.vehicle_image.all(), many=True).data
         representation["documents"] = DocsSerializer(instance.documents.all(), many=True).data
+        representation["company"] = OrganizationSerializer(instance.company).data
         return representation
     
+    def get_sale_or_rent_vehicle(self, obj):
+        exist_sale = VehicleSale.objects.filter(vehicle=obj)
+        exist_rent = VehicleRent.objects.filter(vehicle=obj)
+        if exist_sale.exists():
+            return SaleSerializer(instance=exist_sale).data
+        if exist_rent.exists():
+            return RentSerializer(instance=exist_rent).data
