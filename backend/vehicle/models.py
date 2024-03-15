@@ -65,7 +65,7 @@ class BaseVehicle(models.Model):
         verbose_name_plural = _("Vehicle")
 
 
-class VehicleRent(BaseVehicle):
+class VehicleRent(models.Model):
     price_per_day = models.DecimalField(
         _("Price Per Day"), max_digits=65, decimal_places=2
     )
@@ -83,7 +83,7 @@ class VehicleRent(BaseVehicle):
         return f"{self.title} - {self.brand} - {self.model}"
 
 
-class VehicleSale(BaseVehicle):
+class VehicleSale(models.Model):
     cost_price = models.DecimalField(_("Cost Price"), max_digits=65, decimal_places=2)
     sale_price = models.DecimalField(_("Sale Price"), max_digits=65, decimal_places=2)
     vehicle = models.ForeignKey("vehicle.BaseVehicle", on_delete=models.CASCADE)
