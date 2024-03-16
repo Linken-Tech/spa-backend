@@ -4,7 +4,7 @@ import django.contrib.postgres.fields
 from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
-import vehicle.models
+import vehicle.models_v1
 
 
 class Migration(migrations.Migration):
@@ -362,7 +362,7 @@ class Migration(migrations.Migration):
                 (
                     "vehicle_image",
                     models.ImageField(
-                        upload_to=vehicle.models.vehicle_image_upload_path
+                        upload_to=vehicle.models_v1.vehicle_image_upload_path
                     ),
                 ),
                 ("created", models.DateTimeField(auto_now_add=True)),
@@ -393,7 +393,7 @@ class Migration(migrations.Migration):
                 (
                     "document",
                     models.FileField(
-                        null=True, upload_to=vehicle.models.vehicle_document_upload_path
+                        null=True, upload_to=vehicle.models_v1.vehicle_document_upload_path
                     ),
                 ),
                 ("created", models.DateTimeField(auto_now_add=True)),

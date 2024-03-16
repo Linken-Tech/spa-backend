@@ -1,7 +1,7 @@
 from django_filters import filters
 from django_filters.rest_framework import filterset
 from django.db.models import Q
-from vehicle.models import Vehicle
+from vehicle.models_v1 import Vehicle
 
 
 class VehicleFilter(filterset.FilterSet):
