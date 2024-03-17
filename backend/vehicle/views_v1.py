@@ -1,4 +1,3 @@
-# from io import StringIO
 from vehicle.models_v1 import Vehicle, VehicleBrand, VehicleDocument
 from rest_framework import generics
 from vehicle import serializers_v1 as vehicle_srlz
