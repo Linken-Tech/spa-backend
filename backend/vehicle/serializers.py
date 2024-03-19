@@ -44,7 +44,7 @@ class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = BaseVehicle
         fields = [
-            "id"
+            "id",
             "title",
             "model",
             "brand",
@@ -85,3 +85,15 @@ class VehicleSerializer(serializers.ModelSerializer):
             return SaleSerializer(instance=exist_sale).data
         if exist_rent.exists():
             return RentSerializer(instance=exist_rent).data
+
+
+# class SaleSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = VehicleSale
+#         fields = ["cost_price", "sale_price", "vehicle"]
+
+
+# class RentSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = VehicleRent
+#         fields = ["price_per_day", "price_per_month", "is_rent", "vehicle"]

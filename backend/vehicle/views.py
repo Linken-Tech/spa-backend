@@ -1,31 +1,37 @@
-from rest_framework import viewsets, generics
+from rest_framework import viewsets
 import os
 import zipfile
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_list_or_404
+from core import settings
 import io
 
-from .serializers import VehicleSerializer, BrandSerializer
-from .models import BaseVehicle, Brand
-from vehicle import filters
+
+from .serializers import (
+    VehicleSerializer,
+    BrandSerializer,
+    # SaleSerializer,
+    # RentSerializer,
+)
+from .models import BaseVehicle, Brand, VehicleSale, VehicleRent
 
 
 class BrandViewSet(viewsets.ModelViewSet):
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
 
+
 class VehicleViewSet(viewsets.ModelViewSet):
     queryset = BaseVehicle.objects.all()
     serializer_class = VehicleSerializer
-    filterset_class = filters.VehicleFilter
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset.exclude(removed__isnull=False)
+        queryset.exclude(removed_at__isnull=False)
         return queryset
 
     def get_serializer(self, *args, **kwargs):
-        kwargs['fields'] = [
+        kwargs["fields"] = [
             "id",
             "title",
             "model",
@@ -42,20 +48,34 @@ class VehicleViewSet(viewsets.ModelViewSet):
             "company",
             "is_available",
         ]
-    
+
+
+class VehicleSaleViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = VehicleSale.objects.all()
+    # serializer_class = SaleSerializer
+
+    # def get_object(self):
+    #     obj = super().get_object()
+
+
+class VehicleRentViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = VehicleRent.objects.all()
+    # serializer_class = RentSerializer
+
+
 class DownloadDocumentsViewSet(viewsets.GenericViewSet):
     queryset = BaseVehicle.objects.all()
     serializer_class = VehicleSerializer
     lookup_field = "pk"
 
     def get_serializer(self, *args, **kwargs):
-        kwargs['fields'] = ["id", "documents"]
+        kwargs["fields"] = ["id", "documents"]
         return super().get_serializer(*args, **kwargs)
 
     def get_queryset(self):
-        queryset = super().get_queryset().exclude(removed__isnull=False)
+        queryset = super().get_queryset().exclude(removed_at__isnull=False)
         return queryset
-    
+
     def get(self, request, *args, **kwargs):
         doc_id = request.GET.getlist("doc_id", [])
         files = []

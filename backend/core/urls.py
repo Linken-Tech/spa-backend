@@ -26,7 +26,13 @@ from django.conf.urls.static import static
 
 from user.views import AuthViewSet, UserViewSet, HealthCheckView, ErrorCheckView
 from feedback.views import FeedbackViewSet
-from vehicle.views import VehicleViewSet, BrandViewSet, DownloadDocumentsViewSet
+from vehicle.views import (
+    VehicleViewSet,
+    BrandViewSet,
+    VehicleSaleViewSet,
+    VehicleRentViewSet,
+    DownloadDocumentsViewSet,
+)
 from organization.views import OrganizationViewSet
 
 schema_view_v1 = get_schema_view(
@@ -44,7 +50,7 @@ schema_view_v2 = get_schema_view(
     openapi.Info(
         title="SPA Project API",
         default_version="v2",
-        description="Spa Project V1 API Endpoint",
+        description="Spa Project V2 API Endpoint",
         license=openapi.License(name="Linken Tech License"),
     ),
     public=True,
@@ -58,6 +64,8 @@ router_v2.register(r"user", UserViewSet, basename="user")
 router_v2.register(r"feedback", FeedbackViewSet, basename="feedback")
 router_v2.register(r"brand", BrandViewSet, basename="brand")
 router_v2.register(r"vehicle", VehicleViewSet, basename="vehicle")
+router_v2.register(r"vehicle-sale", VehicleSaleViewSet, basename="vehicle-sale")
+router_v2.register(r"vehicle-rent", VehicleRentViewSet, basename="vehicle-rent")
 router_v2.register(r"download-docs", DownloadDocumentsViewSet, basename="download-docs")
 router_v2.register(r"organization", OrganizationViewSet, basename="organization")
 
@@ -66,21 +74,21 @@ router_v1 = routers.SimpleRouter()
 router_v1.register(r"feedback", FeedbackViewSet, basename="feedback")
 
 urlpatterns = [
-    path("api/v2/health-check/", HealthCheckView.as_view(), name="health-check"),
-    path("api/v2/error-check/", ErrorCheckView.as_view(), name="error-check"),
-    path("api/v2/", include(router_v2.urls)),
+    path("v2/health-check/", HealthCheckView.as_view(), name="health-check"),
+    path("v2/error-check/", ErrorCheckView.as_view(), name="error-check"),
+    path("v2/", include(router_v2.urls)),
     re_path(
-        r"^swagger(?P<format>\.json|\.yaml)$",
+        r"^v2-swagger(?P<format>\.json|\.yaml)$",
         schema_view_v2.without_ui(cache_timeout=0),
         name="schema-json",
     ),
     re_path(
-        r"^swagger/$",
+        r"^v2-swagger/$",
         schema_view_v2.with_ui("swagger", cache_timeout=0),
         name="schema-swagger-ui",
     ),
     re_path(
-        r"^redoc/$",
+        r"^v2-redoc/$",
         schema_view_v2.with_ui("redoc", cache_timeout=0),
         name="schema-redoc",
     ),
