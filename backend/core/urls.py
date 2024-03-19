@@ -26,7 +26,7 @@ from django.conf.urls.static import static
 
 from user.views import AuthViewSet, UserViewSet, HealthCheckView, ErrorCheckView
 from feedback.views import FeedbackViewSet
-from vehicle.views import VehicleViewSet, BrandViewSet
+from vehicle.views import VehicleViewSet, BrandViewSet, DownloadDocumentsViewSet
 from organization.views import OrganizationViewSet
 
 schema_view_v1 = get_schema_view(
@@ -58,6 +58,7 @@ router_v2.register(r"user", UserViewSet, basename="user")
 router_v2.register(r"feedback", FeedbackViewSet, basename="feedback")
 router_v2.register(r"brand", BrandViewSet, basename="brand")
 router_v2.register(r"vehicle", VehicleViewSet, basename="vehicle")
+router_v2.register(r"download-docs", DownloadDocumentsViewSet, basename="download-docs")
 router_v2.register(r"organization", OrganizationViewSet, basename="organization")
 
 # v1 api

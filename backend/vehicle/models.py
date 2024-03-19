@@ -59,6 +59,7 @@ class BaseVehicle(models.Model):
     is_available = models.BooleanField(_("Is Available"), default=True)
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
     modified_at = models.DateTimeField(_("Modified At"), auto_now=True)
+    removed_at = models.DateTimeField(_("Removed At"), auto_now=True)
 
     class Meta:
         verbose_name = _("Vehicle")

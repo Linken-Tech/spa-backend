@@ -44,6 +44,7 @@ class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = BaseVehicle
         fields = [
+            "id"
             "title",
             "model",
             "brand",
