@@ -14,6 +14,7 @@ from .serializers import (
     RentSerializer,
 )
 from .models import BaseVehicle, Brand, VehicleSale, VehicleRent
+from vehicle import filters
 
 
 class BrandViewSet(viewsets.ModelViewSet):
@@ -24,6 +25,7 @@ class BrandViewSet(viewsets.ModelViewSet):
 class VehicleSaleViewSet(viewsets.ModelViewSet):
     queryset = VehicleSale.objects.all()
     serializer_class = SaleSerializer
+    filterset_class = filters.VehicleSaleFilter
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -33,6 +35,7 @@ class VehicleSaleViewSet(viewsets.ModelViewSet):
 class VehicleRentViewSet(viewsets.ModelViewSet):
     queryset = VehicleRent.objects.all()
     serializer_class = RentSerializer
+    filterset_class = filters.VehicleRentFilter
 
     def get_queryset(self):
         queryset = super().get_queryset()

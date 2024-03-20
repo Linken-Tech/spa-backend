@@ -8,7 +8,7 @@ from django.http import Http404, HttpResponse
 from core import settings
 import io
 from django.shortcuts import get_list_or_404
-from vehicle import filters
+from vehicle import filters_v1
 
 
 # Vehicle Brand Here
