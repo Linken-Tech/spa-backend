@@ -16,16 +16,6 @@ class ModelSerializer(serializers.ModelSerializer):
         fields = ["model_name"]
 
 
-class SaleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VehicleSale
-        fields = ["cost_price", "sale_price"]
-
-
-class RentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VehicleRent
-        fields = ["price_per_day", "price_per_month", "is_rent"]
 
 
 class VehicleSerializer(serializers.ModelSerializer):
@@ -35,9 +25,6 @@ class VehicleSerializer(serializers.ModelSerializer):
     images = serializers.ListField(write_only=True, required=False)
     documents = serializers.ListField(write_only=True, required=False)
     company = OrganizationSerializer()
-    sale_or_rent_vehicle = serializers.SerializerMethodField(
-        method_name="get_sale_or_rent_vehicle"
-    )
     delete_images = serializers.ListField(write_only=True, required=False)
     delete_documents = serializers.ListField(write_only=True, required=False)
 
@@ -59,7 +46,6 @@ class VehicleSerializer(serializers.ModelSerializer):
             "documents",
             "company",
             "is_available",
-            "sale_or_rent_vehicle",
             "delete_images",
             "delete_documents",
         ]
@@ -78,22 +64,76 @@ class VehicleSerializer(serializers.ModelSerializer):
         representation["company"] = OrganizationSerializer(instance.company).data
         return representation
 
-    def get_sale_or_rent_vehicle(self, obj):
-        exist_sale = VehicleSale.objects.filter(vehicle=obj)
-        exist_rent = VehicleRent.objects.filter(vehicle=obj)
-        if exist_sale.exists():
-            return SaleSerializer(instance=exist_sale).data
-        if exist_rent.exists():
-            return RentSerializer(instance=exist_rent).data
+class SaleSerializer(serializers.ModelSerializer):
+    vehicle = VehicleSerializer()
+    class Meta:
+        model = VehicleSale
+        fields = ["cost_price", "sale_price", "vehicle"]
 
+    def create(self, validated_data):
+        vehicle = validated_data.pop("vehicle", {})
+        if vehicle:
+            images = vehicle.pop('images', [])
+            docs = vehicle.pop('documents', [])
+            create_base_vehicle = BaseVehicle.objects.create(**vehicle)
+            if images:
+                [Image.create_file(image, create_base_vehicle) for image in images]
+            if docs:
+                [Documents.create_file(docs, create_base_vehicle) for doc in docs]
+        create_vehicle_sale = VehicleRent.objects.create(**validated_data, vehicle=create_base_vehicle)
+        return create_vehicle_sale
+    
+    def update(self, instance, validated_data):
+        vehicle = validated_data.pop("vehicle", {})
+        instance = super().update(instance, validated_data)
+        if vehicle:
+            images = vehicle.pop('images', [])
+            docs = vehicle.pop("docs", [])
+            delete_images = vehicle.pop('delete_images', [])
+            update_base_vehicle = instance.vehicle.update(**vehicle)
+            if images:
+                [Image.create_file(image, instance) for image in images]
+            if delete_images:
+                Image.objects.filter(pk__in=delete_images).delete()
+            if docs:
+                [Documents.create_file(doc, instance) for doc in docs]
+            if delete_documents:
+                Documents.objects.filter(pk__in=delete_documents).delete()
+        return instance
 
-# class SaleSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = VehicleSale
-#         fields = ["cost_price", "sale_price", "vehicle"]
+class RentSerializer(serializers.ModelSerializer):
+    vehicle = VehicleSerializer()
+    class Meta:
+        model = VehicleRent
+        fields = ["price_per_day", "price_per_month", "is_rent", "vehicle"]
 
-
-# class RentSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = VehicleRent
-#         fields = ["price_per_day", "price_per_month", "is_rent", "vehicle"]
+    def create(self, validated_data):
+        vehicle = validated_data.pop("vehicle", {})
+        if vehicle:
+            images = vehicle.pop('images', [])
+            docs = vehicle.pop('documents', [])
+            create_base_vehicle = BaseVehicle.objects.create(**vehicle)
+            if images:
+                [Image.create_file(image, create_base_vehicle) for image in images]
+            if docs:
+                [Documents.create_file(docs, create_base_vehicle) for doc in docs]
+        create_vehicle_rent = VehicleRent.objects.create(**validated_data, vehicle=create_base_vehicle)
+        return create_vehicle_rent
+    
+    def update(self, instance, validated_data):
+        vehicle = validated_data.pop("vehicle", {})
+        instance = super().update(instance, validated_data)
+        if vehicle:
+            images = vehicle.pop('images', [])
+            docs = vehicle.pop("docs", [])
+            delete_images = vehicle.pop('delete_images', [])
+            update_base_vehicle = instance.vehicle.update(**vehicle)
+            if images:
+                [Image.create_file(image, instance) for image in images]
+            if delete_images:
+                Image.objects.filter(pk__in=delete_images).delete()
+            if docs:
+                [Documents.create_file(doc, instance) for doc in docs]
+            if delete_documents:
+                Documents.objects.filter(pk__in=delete_documents).delete()
+        return instance

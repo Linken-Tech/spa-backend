@@ -10,8 +10,8 @@ import io
 from .serializers import (
     VehicleSerializer,
     BrandSerializer,
-    # SaleSerializer,
-    # RentSerializer,
+    SaleSerializer,
+    RentSerializer,
 )
 from .models import BaseVehicle, Brand, VehicleSale, VehicleRent
 
@@ -21,46 +21,23 @@ class BrandViewSet(viewsets.ModelViewSet):
     serializer_class = BrandSerializer
 
 
-class VehicleViewSet(viewsets.ModelViewSet):
-    queryset = BaseVehicle.objects.all()
-    serializer_class = VehicleSerializer
+class VehicleSaleViewSet(viewsets.ModelViewSet):
+    queryset = VehicleSale.objects.all()
+    serializer_class = SaleSerializer
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset.exclude(removed_at__isnull=False)
+        queryset.exclude(vehicle__removed_at__isnull=False)
         return queryset
 
-    def get_serializer(self, *args, **kwargs):
-        kwargs["fields"] = [
-            "id",
-            "title",
-            "model",
-            "brand",
-            "overview",
-            "model_year",
-            "number_plate",
-            "fuel_type",
-            "seating_capacity",
-            "mileage",
-            "accessories",
-            "images",
-            "documents",
-            "company",
-            "is_available",
-        ]
-
-
-class VehicleSaleViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = VehicleSale.objects.all()
-    # serializer_class = SaleSerializer
-
-    # def get_object(self):
-    #     obj = super().get_object()
-
-
-class VehicleRentViewSet(viewsets.ReadOnlyModelViewSet):
+class VehicleRentViewSet(viewsets.ModelViewSet):
     queryset = VehicleRent.objects.all()
-    # serializer_class = RentSerializer
+    serializer_class = RentSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset.exclude(vehicle__removed_at__isnull=False)
+        return queryset
 
 
 class DownloadDocumentsViewSet(viewsets.GenericViewSet):
