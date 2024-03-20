@@ -15,9 +15,6 @@ class ModelSerializer(serializers.ModelSerializer):
         model = Model
         fields = ["model_name"]
 
-
-
-
 class VehicleSerializer(serializers.ModelSerializer):
     brand = BrandSerializer()
     model = ModelSerializer()
