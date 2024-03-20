@@ -12,8 +12,9 @@ from .serializers import (
     BrandSerializer,
     SaleSerializer,
     RentSerializer,
+    VehicleModelSerializer,
 )
-from .models import BaseVehicle, Brand, VehicleSale, VehicleRent
+from .models import BaseVehicle, Brand, VehicleSale, VehicleRent, Model
 from vehicle import filters
 from utils.request import request_user
 
@@ -21,6 +22,11 @@ from utils.request import request_user
 class BrandViewSet(viewsets.ModelViewSet):
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
+
+
+class ModelViewSet(viewsets.ModelViewSet):
+    queryset = Model.objects.all()
+    serializer_class = VehicleModelSerializer
 
 
 class VehicleSaleViewSet(viewsets.ModelViewSet):

@@ -27,11 +27,11 @@ from django.conf.urls.static import static
 from user.views import AuthViewSet, UserViewSet, HealthCheckView, ErrorCheckView
 from feedback.views import FeedbackViewSet
 from vehicle.views import (
-    VehicleViewSet,
     BrandViewSet,
     VehicleSaleViewSet,
     VehicleRentViewSet,
     DownloadDocumentsViewSet,
+    ModelViewSet,
 )
 from organization.views import OrganizationViewSet
 
@@ -63,6 +63,7 @@ router_v2.register(r"auth", AuthViewSet, basename="auth")
 router_v2.register(r"user", UserViewSet, basename="user")
 router_v2.register(r"feedback", FeedbackViewSet, basename="feedback")
 router_v2.register(r"brand", BrandViewSet, basename="brand")
+router_v2.register(r"vehicle-model", ModelViewSet, basename="model")
 router_v2.register(r"vehicle-sale", VehicleSaleViewSet, basename="vehicle-sale")
 router_v2.register(r"vehicle-rent", VehicleRentViewSet, basename="vehicle-rent")
 router_v2.register(r"download-docs", DownloadDocumentsViewSet, basename="download-docs")
