@@ -32,11 +32,14 @@ class VehicleSaleViewSet(viewsets.ModelViewSet):
         user = request_user(self.request)
         if user is not None:
             return user.organization
-       
+
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset.filter(vehicle__company=self.get_object()).exclude(vehicle__removed_at__isnull=False)
+        queryset.filter(vehicle__company=self.get_object()).exclude(
+            vehicle__removed_at__isnull=False
+        )
         return queryset
+
 
 class VehicleRentViewSet(viewsets.ModelViewSet):
     queryset = VehicleRent.objects.all()
@@ -50,8 +53,11 @@ class VehicleRentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset.filter(vehicle__company=self.get_object()).exclude(vehicle__removed_at__isnull=False)
+        queryset.filter(vehicle__company=self.get_object()).exclude(
+            vehicle__removed_at__isnull=False
+        )
         return queryset
+
 
 class DownloadDocumentsViewSet(viewsets.GenericViewSet):
     queryset = BaseVehicle.objects.all()

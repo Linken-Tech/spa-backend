@@ -46,7 +46,7 @@ class VehicleList(generics.ListCreateAPIView):
 
     queryset = Vehicle.objects.exclude(removed__isnull=False)
     serializer_class = vehicle_srlz.VehicleSerializer
-    filterset_class = filters.VehicleFilter
+    filterset_class = filters_v1.VehicleFilter
 
 
 class VehicleDetails(generics.RetrieveUpdateDestroyAPIView):
