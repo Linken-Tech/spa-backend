@@ -4,5 +4,5 @@ def request_user(request):
         if user_auth.is_anonymous:
             return None
         return request.user.user
-    except:
+    except Exception:
         return None
