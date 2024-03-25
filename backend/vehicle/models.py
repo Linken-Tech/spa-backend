@@ -38,9 +38,11 @@ class Model(models.Model):
 
 
 class BaseVehicle(models.Model):
-    title = models.CharField(_("Title"), max_length=255)
+    company = models.ForeignKey("organization.Organization", on_delete=models.CASCADE)
     model = models.ForeignKey("vehicle.Model", on_delete=models.CASCADE)
     brand = models.ForeignKey("vehicle.Brand", on_delete=models.CASCADE)
+
+    title = models.CharField(_("Title"), max_length=255)
     overview = models.CharField(_("Overview"), max_length=255)
     model_year = models.IntegerField(_("Model Year"), default=None)
     number_plate = models.CharField(_("Number Plate"), max_length=10)
@@ -49,13 +51,12 @@ class BaseVehicle(models.Model):
     )
     seating_capacity = models.IntegerField(_("Seating Capacity"))
     mileage = models.IntegerField(_("Mileage"))
-    # accessories = ArrayField(_('Accessories'), models.CharField(max_length=100), max_length=255, default=None)
     accessories = ArrayField(
         models.CharField(max_length=100), size=10, max_length=255, default=None
     )
     images = fields.GenericRelation(Image)
     documents = fields.GenericRelation(Document)
-    company = models.ForeignKey("organization.Organization", on_delete=models.CASCADE)
+
     is_available = models.BooleanField(_("Is Available"), default=True)
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
     modified_at = models.DateTimeField(_("Modified At"), auto_now=True)
@@ -67,6 +68,8 @@ class BaseVehicle(models.Model):
 
 
 class VehicleRent(models.Model):
+    vehicle = models.ForeignKey("vehicle.BaseVehicle", on_delete=models.CASCADE)
+
     price_per_day = models.DecimalField(
         _("Price Per Day"), max_digits=65, decimal_places=2
     )
@@ -74,7 +77,6 @@ class VehicleRent(models.Model):
         _("Price Per Month"), max_digits=65, decimal_places=2
     )
     is_rent = models.BooleanField(_("Is Rent"), default=False)
-    vehicle = models.ForeignKey("vehicle.BaseVehicle", on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _("Vehicle Rent")
@@ -85,9 +87,9 @@ class VehicleRent(models.Model):
 
 
 class VehicleSale(models.Model):
+    vehicle = models.ForeignKey("vehicle.BaseVehicle", on_delete=models.CASCADE)
     cost_price = models.DecimalField(_("Cost Price"), max_digits=65, decimal_places=2)
     sale_price = models.DecimalField(_("Sale Price"), max_digits=65, decimal_places=2)
-    vehicle = models.ForeignKey("vehicle.BaseVehicle", on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _("Vehicle Sale")

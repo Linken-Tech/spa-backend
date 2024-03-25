@@ -25,20 +25,20 @@ class UserAuth(AbstractBaseUser, PermissionsMixin):
 
 
 class User(models.Model):
+    objects = models.Manager()
+    organization = models.ForeignKey(
+        "organization.Organization", on_delete=models.CASCADE
+    )
+
     user_auth = models.OneToOneField("UserAuth", on_delete=models.CASCADE)
     fullname = models.CharField(max_length=255)
     email = models.EmailField(max_length=200, unique=True)
     phone = models.CharField(
         _("Phone No."), max_length=15, validators=[RegexValidator.phone_val]
     )
-    organization = models.ForeignKey(
-        "organization.Organization", on_delete=models.CASCADE
-    )
     is_active = models.BooleanField(_("Is Active"), default=True)
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
     modified_at = models.DateTimeField(_("Modified At"), auto_now=True)
-
-    objects = models.Manager()
 
     class Meta:
         verbose_name = _("User")

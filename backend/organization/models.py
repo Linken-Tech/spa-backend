@@ -24,12 +24,13 @@ class Organization(models.Model):
 
 
 class OrganizationContact(models.Model):
+    company = models.ForeignKey("organization.Organization", on_delete=models.CASCADE)
+
     contact_name = models.CharField(_("Contact Name"), max_length=255)
     phone = models.CharField(
         _("Phone No."), max_length=15, validators=[RegexValidator.phone_val]
     )
     position = models.CharField(_("Position"), max_length=100)
-    company = models.ForeignKey("organization.Organization", on_delete=models.CASCADE)
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
     modified_at = models.DateTimeField(_("Modified At"), auto_now=True)
 
