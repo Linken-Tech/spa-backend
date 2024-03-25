@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 from decouple import config
-from dj_database_url import parse as db_url
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -64,7 +63,7 @@ INSTALLED_APPS = [
     "user",
     "vehicle",
     "feedback",
-    "utils"
+    "utils",
     "file",
     "organization",
 ]

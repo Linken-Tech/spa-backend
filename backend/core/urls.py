@@ -22,7 +22,7 @@ from drf_yasg import openapi
 from django.conf import settings
 from django.conf.urls.static import static
 
-from user.views import HealthCheckView, ErrorCheckView
+from utils.views import HealthCheckView, ErrorCheckView
 
 
 schema_view = get_schema_view(
