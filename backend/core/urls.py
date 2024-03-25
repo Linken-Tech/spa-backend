@@ -14,17 +14,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.contrib import admin
 from django.urls import path, include, re_path
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import routers
-from django.contrib import admin
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 
-from user.views import AuthViewSet, UserViewSet, HealthCheckView, ErrorCheckView
+from user.views import AuthViewSet, UserViewSet
 from feedback.views import FeedbackViewSet
 from vehicle.views import (
     BrandViewSet,
@@ -34,6 +34,7 @@ from vehicle.views import (
     ModelViewSet,
 )
 from organization.views import OrganizationViewSet
+from utils.views import HealthCheckView, ErrorCheckView
 
 schema_view_v1 = get_schema_view(
     openapi.Info(

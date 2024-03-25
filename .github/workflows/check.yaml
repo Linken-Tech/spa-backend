@@ -20,7 +20,7 @@ jobs:
     steps:      
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Lint
+      - name: Testing
         run: | 
           echo "${{ secrets.ENV_FILE }}" > backend/.env
           docker-compose run --rm backend sh -c "python manage.py test"
