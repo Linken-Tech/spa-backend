@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 from decouple import config
-from dj_database_url import parse as db_url
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -63,6 +62,7 @@ INSTALLED_APPS = [
     "user",
     "vehicle",
     "feedback",
+    "utils",
     "file",
     "organization",
 ]
@@ -99,30 +99,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "core.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-database_switch = 1
-
-if database_switch == 1:
-    # locahost database
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": config("DB_NAME"),
-            "USER": config("DB_USER"),
-            "PASSWORD": config("DB_PASSWORD"),
-            "HOST": config("DB_HOST"),
-            "PORT": config("DB_PORT", cast=int),
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST": config("DB_HOST"),
+        "PORT": config("DB_PORT", cast=int),
     }
-elif database_switch == 2:
-    DATABASES = {
-        "default": db_url(
-            "sqlite:///" + os.path.join(BASE_DIR, "db.sqlite3"),
-        )
-    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
