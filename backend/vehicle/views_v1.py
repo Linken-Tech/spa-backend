@@ -45,7 +45,7 @@ class VehicleList(generics.ListCreateAPIView):
     """
 
     queryset = Vehicle.objects.exclude(removed__isnull=False)
-    serializer_class = vehicle_srlz.VehicleSerializer
+    serializer_class = vehicle_srlz.VehicleSerializerV1
     filterset_class = filters_v1.VehicleFilter
 
 
@@ -57,7 +57,7 @@ class VehicleDetails(generics.RetrieveUpdateDestroyAPIView):
     """
 
     queryset = Vehicle.objects.all()
-    serializer_class = vehicle_srlz.VehicleSerializer
+    serializer_class = vehicle_srlz.VehicleSerializerV1
 
     def perform_destroy(self, instance):
         queryset_doc = instance.documents.filter(vehicle_id=instance)
