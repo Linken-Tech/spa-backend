@@ -36,3 +36,4 @@ sqlparse==0.4.4
 typing_extensions==4.10.0
 uritemplate==4.1.1
 urllib3==1.26.18
+flake8==7.0.0
