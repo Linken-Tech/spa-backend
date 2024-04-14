@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 from user.models import UserAuth, User
-from user.serializers import AuthSerializer, UserSerializer
+from user.serializers import AuthSerializer, UserSerializer, LoginSerializer
 
 
 class AuthViewSet(viewsets.ModelViewSet):
@@ -17,4 +17,4 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class UserLogin(TokenObtainPairView):
-    serializer_class = AuthSerializer
+    serializer_class = LoginSerializer
