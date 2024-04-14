@@ -20,11 +20,11 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import routers
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from django.conf import settings
 from django.conf.urls.static import static
 
-from user.views import AuthViewSet, UserViewSet
+from user.views import AuthViewSet, UserViewSet, UserLogin
 from feedback.views import FeedbackViewSet
 from vehicle.views import (
     BrandViewSet,
@@ -77,6 +77,11 @@ router_v1.register(r"feedback", FeedbackViewSet, basename="feedback")
 urlpatterns = [
     path("v2/health-check/", HealthCheckView.as_view(), name="health-check"),
     path("v2/error-check/", ErrorCheckView.as_view(), name="error-check"),
+    path("v2/auth/login", UserLogin.as_view(), name="login"),
+    path('auth/token/refresh/',
+        TokenRefreshView.as_view(),name='api-token-refresh'),
+    path('auth/token/verify/',
+        TokenVerifyView.as_view(), name='api-token-verify'),
     path("v2/", include(router_v2.urls)),
     re_path(
         r"^v2-swagger(?P<format>\.json|\.yaml)$",
