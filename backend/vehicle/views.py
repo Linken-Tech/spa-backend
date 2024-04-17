@@ -1,90 +1,81 @@
-# from io import StringIO
-from vehicle.models import Vehicle, VehicleBrand, VehicleDocument
-from rest_framework import generics
-from vehicle import serializers as vehicle_srlz
-from django.utils import timezone
+from rest_framework import viewsets
 import os
 import zipfile
 from django.http import Http404, HttpResponse
+from django.shortcuts import get_list_or_404
 from core import settings
 import io
-from django.shortcuts import get_list_or_404
+
+
+from .serializers import (
+    VehicleSerializer,
+    BrandSerializer,
+    SaleSerializer,
+    RentSerializer,
+    VehicleModelSerializer,
+)
+from .models import BaseVehicle, Brand, VehicleSale, VehicleRent, Model
 from vehicle import filters
+from utils.request import request_user
 
 
-# Vehicle Brand Here
-class BrandList(generics.ListCreateAPIView):
-    """
-    Create New Brand
-    View All Brand in a List
-    """
-
-    queryset = VehicleBrand.objects.exclude(removed_at__isnull=False)
-    serializer_class = vehicle_srlz.VehicleBrandSerializer
+class BrandViewSet(viewsets.ModelViewSet):
+    queryset = Brand.objects.all()
+    serializer_class = BrandSerializer
 
 
-class BrandDetails(generics.RetrieveUpdateDestroyAPIView):
-    """
-    View Brand Details
-    Update Brand Details
-    Delete Brand
-    """
-
-    queryset = VehicleBrand.objects.all()
-    serializer_class = vehicle_srlz.VehicleBrandSerializer
-
-    def perform_destroy(self, instance):
-        instance.removed = timezone.now()
-        return instance.save()
+class ModelViewSet(viewsets.ModelViewSet):
+    queryset = Model.objects.all()
+    serializer_class = VehicleModelSerializer
 
 
-# Vehicle Here
-class VehicleList(generics.ListCreateAPIView):
-    """
-    Create New Car
-    View All Car in a List
-    """
+class VehicleSaleViewSet(viewsets.ModelViewSet):
+    queryset = VehicleSale.objects.all()
+    serializer_class = SaleSerializer
+    filterset_class = filters.VehicleSaleFilter
 
-    queryset = Vehicle.objects.exclude(removed__isnull=False)
-    serializer_class = vehicle_srlz.VehicleSerializer
-    filterset_class = filters.VehicleFilter
-
-
-class VehicleDetails(generics.RetrieveUpdateDestroyAPIView):
-    """
-    View Car Details
-    Update Car Details
-    Delete Car
-    """
-
-    queryset = Vehicle.objects.all()
-    serializer_class = vehicle_srlz.VehicleSerializer
-
-    def perform_destroy(self, instance):
-        queryset_doc = instance.documents.filter(vehicle_id=instance)
-        queryset_images = instance.vehicle_image.filter(vehicle_id=instance)
-        queryset_doc.update(removed=timezone.now())
-        queryset_images.update(removed=timezone.now())
-        instance.removed = timezone.now()
-        return instance.save()
-
-
-class DownloadVehicleDocuments(generics.GenericAPIView):
-    """
-    Download Vehicle Document
-    """
-
-    queryset = VehicleDocument.objects.all()
-    serializer_class = vehicle_srlz.DownloadVehicleDocumentSerializer
-    lookup_field = "vehicle"
+    def get_object(self):
+        user = request_user(self.request)
+        if user is not None:
+            return user.organization
 
     def get_queryset(self):
-        queryset = (
-            super()
-            .get_queryset()
-            .filter(vehicle=self.kwargs.get("vehicle"))
-            .exclude(removed__isnull=False)
+        queryset = super().get_queryset()
+        queryset.filter(vehicle__company=self.get_object()).exclude(
+            vehicle__removed_at__isnull=False
         )
+        return queryset
+
+
+class VehicleRentViewSet(viewsets.ModelViewSet):
+    queryset = VehicleRent.objects.all()
+    serializer_class = RentSerializer
+    filterset_class = filters.VehicleRentFilter
+
+    def get_object(self):
+        user = request_user(self.request)
+        if user is not None:
+            return user.organization
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset.filter(vehicle__company=self.get_object()).exclude(
+            vehicle__removed_at__isnull=False
+        )
+        return queryset
+
+
+class DownloadDocumentsViewSet(viewsets.GenericViewSet):
+    queryset = BaseVehicle.objects.all()
+    serializer_class = VehicleSerializer
+    lookup_field = "pk"
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs["fields"] = ["id", "documents"]
+        return super().get_serializer(*args, **kwargs)
+
+    def get_queryset(self):
+        queryset = super().get_queryset().exclude(removed_at__isnull=False)
         return queryset
 
     def get(self, request, *args, **kwargs):
@@ -92,14 +83,14 @@ class DownloadVehicleDocuments(generics.GenericAPIView):
         files = []
         if doc_id:
             queryset = get_list_or_404(
-                VehicleDocument, pk__in=doc_id, removed__isnull=True
+                self.get_queryset(), documents__in=doc_id, removed__isnull=True
             )
         else:
             queryset = self.get_queryset()
 
         if queryset:
             for vehicle in queryset:
-                file_format = os.path.join(settings.MEDIA_ROOT, str(vehicle.document))
+                file_format = os.path.join(settings.MEDIA_ROOT, str(vehicle.documents))
                 files.append(file_format)
 
             zip_subdir = "%s(%s)" % (vehicle.vehicle, vehicle.vehicle.model_year)

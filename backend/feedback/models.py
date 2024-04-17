@@ -7,6 +7,10 @@ from utils.validators import RegexValidator
 
 # Create your models here.
 class Feedback(models.Model):
+    organization = models.ForeignKey(
+        "organization.Organization", on_delete=models.CASCADE, null=True
+    )
+
     title = models.CharField(_("Title"), max_length=50, null=True)
     customer_name = models.CharField(
         _("Customer Name"), max_length=100, default="anonymous"
@@ -16,9 +20,6 @@ class Feedback(models.Model):
         _("Phone No."), max_length=15, validators=[RegexValidator.phone_val], null=True
     )
     description = models.TextField(_("Description"), null=True)
-    organization = models.ForeignKey(
-        "organization.Organization", on_delete=models.CASCADE, null=True
-    )
     is_solved = models.BooleanField(_("Is Solved"), default=False)
     created_at = models.DateTimeField(_("Created At"), default=timezone.now)
     modified_at = models.DateTimeField(_("Modified At"), auto_now=True)

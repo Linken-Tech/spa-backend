@@ -3,7 +3,6 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 from file.models import Image, Document
 
 
-# Register your models here.
 class ImageInlineAdmin(GenericTabularInline):
     model = Image
     fields = ("file",)

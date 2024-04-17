@@ -1,135 +1,148 @@
 from rest_framework import serializers
-from vehicle.models import VehicleBrand, VehicleDocument, VehicleImage, Vehicle
+from vehicle.models import Brand, VehicleSale, VehicleRent, Model, BaseVehicle
+from file.serializers import ImageSerializer, DocsSerializer
+from organization.serializers import OrganizationSerializer
+from file.models import Image, Document
 
 
-class VehicleBrandSerializer(serializers.ModelSerializer):
+class BrandSerializer(serializers.ModelSerializer):
     class Meta:
-        model = VehicleBrand
-        fields = "__all__"
+        model = Brand
+        fields = ["brand_name"]
 
 
-class VehicleDocumentSerializer(serializers.ModelSerializer):
+class VehicleModelSerializer(serializers.ModelSerializer):
     class Meta:
-        model = VehicleDocument
-        fields = ["id", "document"]
-
-
-class DownloadVehicleDocumentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VehicleDocument
-        fields = ["id", "document", "vehicle"]
-
-
-class VehicleImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VehicleImage
-        fields = ["id", "vehicle_image"]
-
-
-# class VehicleRentSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = VehicleRent
-#         fields = ['id', 'price_per_day', 'price_per_month', 'is_active']
+        model = Model
+        fields = ["model_name"]
 
 
 class VehicleSerializer(serializers.ModelSerializer):
+    brand = BrandSerializer()
+    model = VehicleModelSerializer()
     accessories = serializers.ListField(write_only=True)
-    vehicle_documents = serializers.ListField(write_only=True, required=False)
-    vehicle_images = serializers.ListField(write_only=True, required=False)
-    delete_documents = serializers.ListField(write_only=True, required=False)
+    images = serializers.ListField(write_only=True, required=False)
+    documents = serializers.ListField(write_only=True, required=False)
+    company = OrganizationSerializer()
     delete_images = serializers.ListField(write_only=True, required=False)
-    # vehicle_rent = VehicleRentSerializer(write_only=True, required=False)
+    delete_documents = serializers.ListField(write_only=True, required=False)
 
     class Meta:
-        model = Vehicle
+        model = BaseVehicle
         fields = [
             "id",
-            "vehicle",
-            "vehicle_brand",
-            "vehicle_overview",
-            "number_plate",
-            "price_per_day",
-            "price_per_month",
-            "price_of_cost",
-            "price_of_sale",
-            "fuel_type",
+            "title",
+            "model",
+            "brand",
+            "overview",
             "model_year",
+            "number_plate",
+            "fuel_type",
             "seating_capacity",
             "mileage",
             "accessories",
-            "vehicle_documents",
-            "vehicle_images",
-            "delete_documents",
+            "images",
+            "documents",
+            "company",
+            "is_available",
             "delete_images",
+            "delete_documents",
         ]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["vehicle_brand"] = VehicleBrandSerializer(
-            instance.vehicle_brand
-        ).data
+        representation["brand"] = BrandSerializer(instance.brand).data
+        representation["model"] = VehicleModelSerializer(instance.model).data
         representation["accessories"] = instance.accessories
-        # request = self.context.get("request").data
-        # if instance.vehicle_rent != None or (request.get('vehicle_rent.price_per_day') and request.get('vehicle_rent.price_per_month')):
-        #     representation['vehicle_rent'] = VehicleRentSerializer(instance.vehicle_rent).data
-        representation["vehicle_documents"] = VehicleDocumentSerializer(
-            instance.documents.all(), many=True
-        ).data
-        representation["vehicle_images"] = VehicleImageSerializer(
+        representation["images"] = ImageSerializer(
             instance.vehicle_image.all(), many=True
         ).data
+        representation["documents"] = DocsSerializer(
+            instance.documents.all(), many=True
+        ).data
+        representation["company"] = OrganizationSerializer(instance.company).data
         return representation
 
+
+class SaleSerializer(serializers.ModelSerializer):
+    vehicle = VehicleSerializer()
+
+    class Meta:
+        model = VehicleSale
+        fields = ["cost_price", "sale_price", "vehicle"]
+
     def create(self, validated_data):
-        car_doc = validated_data.pop("vehicle_documents", [])
-        car_images = validated_data.pop("vehicle_images", [])
-        validated_data.pop("vehicle_rent", {})
-        create_vehicle = super().create(validated_data)
-
-        if car_doc:
-            create_vehicle.documents.bulk_create(
-                [
-                    VehicleDocument(document=doc, vehicle=create_vehicle)
-                    for doc in car_doc
-                ]
-            )
-        if car_images:
-            create_vehicle.vehicle_image.bulk_create(
-                VehicleImage(vehicle_image=image, vehicle=create_vehicle)
-                for image in car_images
-            )
-        # if rent_details:
-        #     rent = VehicleRent.objects.create(price_per_day=rent_details.get('price_per_day'), price_per_month=rent_details.get('price_per_month'))
-        #     create_vehicle.vehicle_rent = rent
-        #     create_vehicle.save()
-
-        return create_vehicle
+        vehicle = validated_data.pop("vehicle", {})
+        if vehicle:
+            images = vehicle.pop("images", [])
+            docs = vehicle.pop("documents", [])
+            create_base_vehicle = BaseVehicle.objects.create(**vehicle)
+            if images:
+                [Image.create_file(image, create_base_vehicle) for image in images]
+            if docs:
+                [Document.create_file(docs, create_base_vehicle) for doc in docs]
+        create_vehicle_sale = VehicleRent.objects.create(
+            **validated_data, vehicle=create_base_vehicle
+        )
+        return create_vehicle_sale
 
     def update(self, instance, validated_data):
-        car_doc = validated_data.pop("vehicle_documents", [])
-        car_images = validated_data.pop("vehicle_images", [])
-        delete_doc = validated_data.pop("delete_documents", [])
-        delete_images = validated_data.pop("delete_images", [])
-        validated_data.pop("vehicle_rent", {})
+        vehicle = validated_data.pop("vehicle", {})
         instance = super().update(instance, validated_data)
+        if vehicle:
+            images = vehicle.pop("images", [])
+            docs = vehicle.pop("docs", [])
+            delete_images = vehicle.pop("delete_images", [])
+            delete_documents = vehicle.pop("delete_documents", [])
+            update_base_vehicle = instance.vehicle.update(**vehicle)
+            if images:
+                [Image.create_file(image, update_base_vehicle) for image in images]
+            if delete_images:
+                Image.objects.filter(pk__in=delete_images).delete()
+            if docs:
+                [Document.create_file(doc, update_base_vehicle) for doc in docs]
+            if delete_documents:
+                Document.objects.filter(pk__in=delete_documents).delete()
+        return instance
 
-        if car_doc:
-            instance.documents.bulk_create(
-                [VehicleDocument(document=doc, vehicle=instance) for doc in car_doc]
-            )
-        if car_images:
-            instance.vehicle_image.bulk_create(
-                VehicleImage(vehicle_image=image, vehicle=instance)
-                for image in car_images
-            )
-        # if rent_details:
-        #     instance.vehicle_rent.price_per_day=rent_details.get('price_per_day')
-        #     instance.vehicle_rent.price_per_month=rent_details.get('price_per_month')
-        #     instance.vehicle_rent.save()
 
-        if delete_doc:
-            instance.documents.filter(id__in=delete_doc).delete()
-        if delete_images:
-            instance.vehicle_image.filter(id__in=delete_images).delete()
+class RentSerializer(serializers.ModelSerializer):
+    vehicle = VehicleSerializer()
 
+    class Meta:
+        model = VehicleRent
+        fields = ["price_per_day", "price_per_month", "is_rent", "vehicle"]
+
+    def create(self, validated_data):
+        vehicle = validated_data.pop("vehicle", {})
+        if vehicle:
+            images = vehicle.pop("images", [])
+            docs = vehicle.pop("documents", [])
+            create_base_vehicle = BaseVehicle.objects.create(**vehicle)
+            if images:
+                [Image.create_file(image, create_base_vehicle) for image in images]
+            if docs:
+                [Document.create_file(docs, create_base_vehicle) for doc in docs]
+        create_vehicle_rent = VehicleRent.objects.create(
+            **validated_data, vehicle=create_base_vehicle
+        )
+        return create_vehicle_rent
+
+    def update(self, instance, validated_data):
+        vehicle = validated_data.pop("vehicle", {})
+        instance = super().update(instance, validated_data)
+        if vehicle:
+            images = vehicle.pop("images", [])
+            docs = vehicle.pop("docs", [])
+            delete_images = vehicle.pop("delete_images", [])
+            delete_documents = vehicle.pop("delete_documents", [])
+            update_base_vehicle = instance.vehicle.update(**vehicle)
+            if images:
+                [Image.create_file(image, update_base_vehicle) for image in images]
+            if delete_images:
+                Image.objects.filter(pk__in=delete_images).delete()
+            if docs:
+                [Document.create_file(doc, update_base_vehicle) for doc in docs]
+            if delete_documents:
+                Document.objects.filter(pk__in=delete_documents).delete()
         return instance

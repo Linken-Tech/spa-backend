@@ -4,7 +4,6 @@ from .models import Organization, OrganizationContact
 from file.admin import ImageInlineAdmin
 
 
-# Register your models here.
 class ProfilePicInline(ImageInlineAdmin):
     verbose_name = "Profile Picture"
     verbose_name_plural = "Profile Picture"
