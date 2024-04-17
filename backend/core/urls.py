@@ -16,29 +16,28 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include, re_path
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-from rest_framework import routers
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
-)
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework import permissions
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
-from user.views import AuthViewSet, UserViewSet, UserLogin
-from feedback.views import FeedbackViewSet
-from vehicle.views import (
-    BrandViewSet,
-    VehicleSaleViewSet,
-    VehicleRentViewSet,
-    DownloadDocumentsViewSet,
-    ModelViewSet,
-)
-from organization.views import OrganizationViewSet
+from user.urls_v2 import urlpatterns as user_urlpatterns
+from feedback.urls import urlpatterns as feedback_urlpatterns
+from vehicle.urls_v2 import urlpatterns as vehicle_urlpatterns
+from organization.urls import urlpatterns as original_organization_urlpatterns
 from utils.views import HealthCheckView, ErrorCheckView
+
+
+urlpatterns = [
+    path("health-check/", HealthCheckView.as_view(), name="health-check"),
+    path("error-check/", ErrorCheckView.as_view(), name="error-check"),
+    path("admin/", admin.site.urls),
+    # Authentication
+    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+]
 
 schema_view_v1 = get_schema_view(
     openapi.Info(
@@ -51,63 +50,12 @@ schema_view_v1 = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
-schema_view_v2 = get_schema_view(
-    openapi.Info(
-        title="SPA Project API",
-        default_version="v2",
-        description="Spa Project V2 API Endpoint",
-        license=openapi.License(name="Linken Tech License"),
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
-
-# v2 api
-router_v2 = routers.SimpleRouter()
-router_v2.register(r"auth", AuthViewSet, basename="auth")
-router_v2.register(r"user", UserViewSet, basename="user")
-router_v2.register(r"feedback", FeedbackViewSet, basename="feedback")
-router_v2.register(r"brand", BrandViewSet, basename="brand")
-router_v2.register(r"vehicle-model", ModelViewSet, basename="model")
-router_v2.register(r"vehicle-sale", VehicleSaleViewSet, basename="vehicle-sale")
-router_v2.register(r"vehicle-rent", VehicleRentViewSet, basename="vehicle-rent")
-router_v2.register(r"download-docs", DownloadDocumentsViewSet, basename="download-docs")
-router_v2.register(r"organization", OrganizationViewSet, basename="organization")
-
 # v1 api
-router_v1 = routers.SimpleRouter()
-router_v1.register(r"feedback", FeedbackViewSet, basename="feedback")
-
-urlpatterns = [
-    path("v2/health-check/", HealthCheckView.as_view(), name="health-check"),
-    path("v2/error-check/", ErrorCheckView.as_view(), name="error-check"),
-    path("v2/auth/login", UserLogin.as_view(), name="login"),
-    path("auth/token/refresh/", TokenRefreshView.as_view(), name="api-token-refresh"),
-    path("auth/token/verify/", TokenVerifyView.as_view(), name="api-token-verify"),
-    path("v2/", include(router_v2.urls)),
-    re_path(
-        r"^v2-swagger(?P<format>\.json|\.yaml)$",
-        schema_view_v2.without_ui(cache_timeout=0),
-        name="schema-json",
-    ),
-    re_path(
-        r"^v2-swagger/$",
-        schema_view_v2.with_ui("swagger", cache_timeout=0),
-        name="schema-swagger-ui",
-    ),
-    re_path(
-        r"^v2-redoc/$",
-        schema_view_v2.with_ui("redoc", cache_timeout=0),
-        name="schema-redoc",
-    ),
-    # v1 api
-    path("health-check/", HealthCheckView.as_view(), name="health-check"),
-    path("error-check/", ErrorCheckView.as_view(), name="error-check"),
-    path("", include(router_v1.urls)),
+urlpatterns_v1 = [
     path("vehicle/", include("vehicle.urls")),
-    path("admin/", admin.site.urls),
-    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path(
+        "feedback/", include((feedback_urlpatterns, "feedback"), namespace="feedback")
+    ),
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
         schema_view_v1.without_ui(cache_timeout=0),
@@ -124,5 +72,54 @@ urlpatterns = [
         name="schema-redoc",
     ),
 ]
+
+schema_view_v2 = get_schema_view(
+    openapi.Info(
+        title="SPA Project API",
+        default_version="v2",
+        description="Spa Project V2 API Endpoint",
+        license=openapi.License(name="Linken Tech License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
+# v2 api
+urlpatterns_v2 = [
+    path(
+        r"v2/organization/",
+        include(
+            (original_organization_urlpatterns, "organization"),
+            namespace="organization_v2",
+        ),
+    ),
+    path(r"v2/user/", include((user_urlpatterns, "users"), namespace="users_v2")),
+    path(
+        r"v2/vehicle/",
+        include((vehicle_urlpatterns, "vehicle"), namespace="vehicle_v2"),
+    ),
+    path(
+        r"v2/feedback/",
+        include((feedback_urlpatterns, "feedback"), namespace="feedback_v2"),
+    ),
+    re_path(
+        r"^v2-swagger(?P<format>\.json|\.yaml)$",
+        schema_view_v2.without_ui(cache_timeout=0),
+        name="schema-json",
+    ),
+    re_path(
+        r"^v2-swagger/$",
+        schema_view_v2.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    re_path(
+        r"^v2-redoc/$",
+        schema_view_v2.with_ui("redoc", cache_timeout=0),
+        name="schema-redoc",
+    ),
+]
+
+urlpatterns += urlpatterns_v1
+urlpatterns += urlpatterns_v2
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

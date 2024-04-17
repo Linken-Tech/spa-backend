@@ -8,8 +8,9 @@ from file.utils import vehicle_image_upload_path, vehicle_document_upload_path
 
 
 class BaseMedia(models.Model):
-    name = models.CharField(_("File Name"), max_length=255)
     content_type = models.ForeignKey(ContentType, on_delete=models.DO_NOTHING)
+
+    name = models.CharField(_("File Name"), max_length=255)
     object_id = models.PositiveIntegerField()
     content_object = fields.GenericForeignKey("content_type", "object_id")
     company = models.ForeignKey("organization.Organization", on_delete=models.CASCADE)

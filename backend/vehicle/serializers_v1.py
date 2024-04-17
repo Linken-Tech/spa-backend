@@ -32,7 +32,7 @@ class VehicleImageSerializer(serializers.ModelSerializer):
 #         fields = ['id', 'price_per_day', 'price_per_month', 'is_active']
 
 
-class VehicleSerializer(serializers.ModelSerializer):
+class VehicleSerializerV1(serializers.ModelSerializer):
     accessories = serializers.ListField(write_only=True)
     vehicle_documents = serializers.ListField(write_only=True, required=False)
     vehicle_images = serializers.ListField(write_only=True, required=False)
