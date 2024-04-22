@@ -14,7 +14,9 @@ from pathlib import Path
 import os
 from decouple import config
 import sentry_sdk
+
 from sentry_sdk.integrations.django import DjangoIntegration
+from core import router
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -54,11 +56,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     "corsheaders",
     "rest_framework",
     "drf_yasg",
     "rest_framework_simplejwt",
     "storages",
+
     "user",
     "vehicle",
     "feedback",
@@ -107,8 +111,20 @@ DATABASES = {
         "PASSWORD": config("DB_PASSWORD"),
         "HOST": config("DB_HOST"),
         "PORT": config("DB_PORT", cast=int),
-    }
+    },
+    "replica": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("REPLICA_DB_NAME"),
+        "USER": config("REPLICA_DB_USER"),
+        "PASSWORD": config("REPLICA_DB_PASSWORD"),
+        "HOST": config("REPLICA_DB_HOST"),
+        "PORT": config("REPLICA_DB_PORT", cast=int),
+    },
 }
+
+USE_REPLICA_DATABASE = config("USE_REPLICA_DATABASE", cast=bool, default=False)
+
+DATABASE_ROUTERS = ["core.router.ReplicaRouter"]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

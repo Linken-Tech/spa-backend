@@ -21,6 +21,20 @@ services:
       timeout: 3s
       retries: 3
 
+  db_replica:
+    image: postgres
+    volumes:
+      - spa-db-replica-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5433:5432"
+    container_name: db_replica
+    depends_on:
+      - db
+
   backend:
     container_name: spa_backend
     entrypoint: [ "/app/api/entrypoint.sh" ]
@@ -43,6 +57,7 @@ services:
 
 volumes:
   spa-db-data:
+  spa-db-replica-data:
 
 networks:
   db-net:
