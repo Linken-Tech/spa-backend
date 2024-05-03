@@ -1,0 +1,114 @@
+Table MasterUser{
+  id int
+  username varchar
+  password hash
+}
+
+Table Client {
+  id int
+  client_name varchar
+  phone_number varchar
+}
+
+Table ClientUser {
+  id int
+  username varchar
+  password hash
+}
+
+Table Company {
+  client_id int
+
+  id int [primary key]
+  company_name varchar
+  address varchar
+  company_profile_image binary
+
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table ClientEmployeePending {
+ id int
+ name varchar
+ position varchar
+}
+
+Table VehicleBrand {
+  id int
+  brand_name varchar
+
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table VehicleModel {
+  id int
+  model_name varchar
+
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table VehicleSale {
+  id int
+  title varchar
+  model_year int
+  number_plate varchar
+  fuel_type varchar
+  seating_capacity varchar
+  accessories varchar
+  status varchar
+  sale_price varchar
+  cost_price varchar
+
+  created_at timestamp
+  updated_at timestamp
+
+  company_id int
+  model_id int
+  brand_id int
+}
+
+Table VehicleSaleImage {
+  id int
+  vehicle_sale_image binary
+}
+
+Table VehicleSaleDocument {
+  id int
+  vehicle_sale_document binary
+}
+
+Table VehicleRent {
+  id int
+  title varchar
+  model_year int
+  number_plate varchar
+  fuel_type varchar
+  seating_capacity varchar
+  accessories varchar
+  status varchar
+  price_per_day decimal
+  price_per_month decimal
+
+  created_at timestamp
+  updated_at timestamp
+
+  company_id int
+  model_id int
+  brand_id int
+}
+
+Table VehicleRentImage {
+  id int
+  vehicle_rent_image binary
+}
+
+Table VehicleRentDocument {
+  id int
+  vehicle_rent_document binary
+}
+
+
+Ref: "Company"."client_id" < "Client"."id"
