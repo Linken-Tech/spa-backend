@@ -1,0 +1,160 @@
+Table MasterUser{
+  id int
+  username varchar
+  password hash
+
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table Client {
+  id int
+  client_name varchar
+  phone_number varchar
+  client_email varchar
+
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table ClientUser {
+  id int
+  username varchar
+  password hash
+  full_name varchar
+  phone_number int
+
+  created_at timestamp
+  updated_at timestamp
+
+  client_id int
+}
+
+Table Company {
+  id int [primary key]
+  company_name varchar
+  address varchar
+  company_profile_image binary
+
+  created_at timestamp
+  updated_at timestamp
+
+  client_id int
+}
+
+Table VehicleBrand {
+  id int
+  brand_name varchar
+
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table VehicleModel {
+  id int
+  model_name varchar
+
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table VehicleSale {
+  id int
+  title varchar
+  model_year int
+  number_plate varchar
+  fuel_type varchar
+  seating_capacity varchar
+  accessories varchar
+  status varchar
+  sale_price varchar
+  cost_price varchar
+
+  created_at timestamp
+  updated_at timestamp
+
+  company_id int
+  model_id int
+  brand_id int
+}
+
+Table VehicleSaleImage {
+  id int
+  vehicle_sale_image binary
+
+  created_at timestamp
+
+  sales_vehicle_id int
+}
+
+Table VehicleSaleDocument {
+  id int
+  vehicle_sale_document binary
+
+  created_at timestamp
+
+  sales_vehicle_id int
+}
+
+Table VehicleRent {
+  id int
+  title varchar
+  model_year int
+  number_plate varchar
+  fuel_type varchar
+  seating_capacity varchar
+  accessories varchar
+  status varchar
+  price_per_day decimal
+  price_per_month decimal
+
+  created_at timestamp
+  updated_at timestamp
+
+  company_id int
+  model_id int
+  brand_id int
+}
+
+Table VehicleRentImage {
+  id int
+  vehicle_rent_image binary
+
+  created_at timestamp
+
+  rent_vehicle_id int
+}
+
+Table VehicleRentDocument {
+  id int
+  vehicle_rent_document binary
+
+  created_at timestamp
+
+  rent_vehicle_id int
+}
+
+
+Ref: "Company"."client_id" < "Client"."id"
+
+Ref: "ClientUser"."client_id" < "Client"."id"
+
+Ref: "VehicleSale"."model_id" < "VehicleModel"."id"
+
+Ref: "VehicleSale"."brand_id" < "VehicleBrand"."id"
+
+Ref: "VehicleRent"."model_id" < "VehicleModel"."id"
+
+Ref: "VehicleRent"."brand_id" < "VehicleBrand"."id"
+
+Ref: "VehicleSale"."company_id" < "Company"."id"
+
+Ref: "VehicleRent"."company_id" < "Company"."id"
+
+Ref: "VehicleSaleImage"."sales_vehicle_id" < "VehicleSale"."id"
+
+Ref: "VehicleSaleDocument"."sales_vehicle_id" < "VehicleSale"."id"
+
+Ref: "VehicleRentImage"."rent_vehicle_id" < "VehicleRent"."id"
+
+Ref: "VehicleRentDocument"."rent_vehicle_id" < "VehicleRent"."id"
