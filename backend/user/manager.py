@@ -6,13 +6,13 @@ class UserManager(BaseUserManager):
     use_in_migrations = True
 
     def _create_user(self, username, password, **extra_fields):
-        from user.models import UserAuth
+        from user.models import User
 
         if not username:
             raise ValueError("The given username must be set")
 
-        username = UserAuth.normalize_username(username)
-        auth = UserAuth(username=username, **extra_fields)
+        username = User.normalize_username(username)
+        auth = User(username=username, **extra_fields)
         auth.password = make_password(password)
         auth.save(using=self._db)
         return auth
@@ -32,3 +32,17 @@ class UserManager(BaseUserManager):
             raise ValueError("Superuser must have is_superuser=True.")
 
         return self._create_user(username, password, **extra_fields)
+
+
+class MasterUserManager(UserManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_staff=True, is_superuser=True)
+
+
+class ClientUserManager(UserManager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(is_staff=False, is_superuser=False, is_client=True)
+        )

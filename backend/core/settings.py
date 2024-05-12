@@ -205,4 +205,4 @@ REDOC_SETTINGS = {
     "LAZY_RENDERING": False,
 }
 
-AUTH_USER_MODEL = "user.UserAuth"
+AUTH_USER_MODEL = "user.User"
