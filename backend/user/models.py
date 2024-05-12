@@ -1,48 +1,70 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.utils.translation import gettext_lazy as _
 
 from utils.validators import RegexValidator
-from user.manager import UserManager
+from user.manager import UserManager, MasterUserManager, ClientUserManager
+from organization.models import Organization
 
 
-class UserAuth(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=100, unique=True)
-    is_staff = models.BooleanField(_("Is Staff"), default=False)
-    is_admin = models.BooleanField(_("Is Admin"), default=False)
+class User(AbstractBaseUser, PermissionsMixin):
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
+    phone = models.CharField(
+        _("Phone No."), max_length=15, validators=[RegexValidator.phone_val]
+    )
+    is_client = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+
+    # ForeignKey Relation
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     USERNAME_FIELD = "username"
+    EMAIL_FIELD = "email"
     REQUIRED_FIELDS = ["password"]
 
     objects = UserManager()
 
     class Meta:
-        verbose_name = _("User Auth")
-        verbose_name_plural = _("User Auth")
-
-    def __str__(self) -> str:
-        return self.username
+        db_table = "user"
+        verbose_name = "User"
+        verbose_name_plural = "Users"
 
 
-class User(models.Model):
-    objects = models.Manager()
-    organization = models.ForeignKey(
-        "organization.Organization", on_delete=models.CASCADE
-    )
-
-    user_auth = models.OneToOneField("UserAuth", on_delete=models.CASCADE)
-    fullname = models.CharField(max_length=255)
-    email = models.EmailField(max_length=200, unique=True)
-    phone = models.CharField(
-        _("Phone No."), max_length=15, validators=[RegexValidator.phone_val]
-    )
-    is_active = models.BooleanField(_("Is Active"), default=True)
-    created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
-    modified_at = models.DateTimeField(_("Modified At"), auto_now=True)
+class MasterUser(User):
+    objects = MasterUserManager()
 
     class Meta:
-        verbose_name = _("User")
-        verbose_name_plural = _("Users")
+        proxy = True
+        db_table = "master_user"
+        verbose_name = "Master User"
+        verbose_name_plural = "Master Users"
 
-    def __str__(self) -> str:
-        return self.fullname
+    def save(self, *args, **kwargs):
+        self.is_staff = True
+        self.is_superuser = True
+        self.is_client = False
+        super().save(*args, **kwargs)
+
+
+class ClientUser(User):
+    objects = ClientUserManager()
+
+    class Meta:
+        proxy = True
+        db_table = "client_user"
+        verbose_name = "Client User"
+        verbose_name_plural = "Client Users"
+
+    def save(self, *args, **kwargs):
+        self.is_staff = False
+        self.is_superuser = False
+        self.is_client = True
+        super().save(*args, **kwargs)
